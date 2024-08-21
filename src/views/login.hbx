@@ -1,0 +1,18 @@
+<div class="page" id="page_register">
+    <form method="POST">
+        <h3>Вход</h3>
+        <p>Ведь ты один из нас?</p>
+
+        {{#if auth_errors.session}}<div class="error">Ошибка генерации ключа сессии, попробуй позже</div>{{/if}}
+        {{#if auth_errors.cookie}}<div class="error">Ошибка сохранения печенек, попробуй позже</div>{{/if}}
+
+        <label for="login">Логин</label>
+        <input type="text" placeholder="Пригодится для входа" name="login" id="login" {{#if user.login}}value="{{user.login}}"{{/if}} />
+        {{#if auth_errors.login}}<div class="error">Что-то не так с этим логином...</div>{{/if}}
+
+        <label for="password">Пароль</label>
+        <input type="password" placeholder="Защитит от взлома" name="password" id="password" {{#if user.password}}value="{{user.password}}"{{/if}} />
+        {{#if auth_errors.password}}<div class="error">Странный пароль...</div>{{/if}}
+        {{#if auth_errors.not_found}}<div class="error">Странный пароль, а, может быть, и логин...</div>{{/if}}
+    </form>
+</div>
