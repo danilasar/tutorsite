@@ -6,8 +6,8 @@
 mod posts;
 
 use actix_web::web;
-use crate::handlers::posts::get_posts::get_posts;
+use crate::handlers::posts::index::{page_index};
 
 pub fn setup(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_posts);
+    cfg.service(page_index);
 }
