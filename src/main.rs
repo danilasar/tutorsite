@@ -1,9 +1,11 @@
 use std::env;
+use std::sync::Arc;
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 use actix_web::web::Data;
 use figment::Figment;
 use figment::providers::Env;
+use handlebars::{DirectorySourceOptions, Handlebars};
 use crate::context::Context;
 
 mod context;
@@ -39,8 +41,14 @@ async fn main() -> std::io::Result<()> {
             panic!("Не могу подключиться к базе");
         });
 
+    let mut handlebars = Handlebars::new();
+    handlebars
+        .register_templates_directory("views", DirectorySourceOptions::default())
+        .unwrap();
+
     let ctx = Context {
-        db: pool
+        db: pool,
+        handlebars: Arc::new(handlebars)
     };
 
     log::info!("Сервер хостится на http://{}:{}", config.host, config.port);

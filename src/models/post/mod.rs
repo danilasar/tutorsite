@@ -1,6 +1,6 @@
 use crate::core::models::DbError;
 
-#[derive(Debug)]
+#[derive(Debug, sqlx::FromRow)]
 pub struct Post {
     id: Option<i32>,
     title: Option<String>,
@@ -9,42 +9,61 @@ pub struct Post {
 
 impl Post {
     pub async fn get_posts(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<Vec<Post>, DbError> {
-        Ok(sqlx::query_as::<_, Post>(include_str!("sql/get_all.sql"))
-            .fetch_all(&pool) // -> Vec<Country>
-            .await?)
+        let posts = sqlx::query_file_as!(Post, "sql/post/get_all.sql")
+            .fetch_all(pool) // -> Vec<Country>
+            .await;
+        if let Err(e) = posts {
+            return Err(DbError::InternalError(e));
+        }
+        Ok(posts.unwrap())
     }
     pub async fn get_post(pool: &sqlx::Pool<sqlx::Postgres>, id:i32) -> Result<Post, DbError> {
-        Ok(sqlx::query_as::<_, Post>(include_str!("sql/get_by_id.sql"))
-            .bind(id)
-            .execute(&pool)
-            .await?
-            .fetch_one());
+        let post = sqlx::query_file_as!(Post, "sql/post/get_by_id.sql", id)
+            .fetch_one(pool)
+            .await;
+        if let Err(e) = post {
+            return Err(DbError::InternalError(e));
+        }
+        Ok(post.unwrap())
     }
     pub async fn create(&mut self, pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), DbError> {
-        let result: (i32,) = sqlx::query(include_str!("sql/create.sql"))
-            .bind(self.title.clone().unwrap_or_default())
-            .bind(self.content.clone().unwrap_or_default())
-            .execute(&pool)
-            .await?
-            .fetch_one();
-        self.id = result.0;
+        let q = sqlx::query_file!(
+                "sql/post/create.sql",
+                self.title.clone().unwrap_or_default(),
+                self.content.clone().unwrap_or_default())
+            .fetch_one(pool)
+            .await;
+        if let Err(e) = q {
+            return Err(DbError::InternalError(e));
+        }
+        self.id = Option::from(q.unwrap().id);
         Ok(())
     }
     pub async fn remove_by_id(pool: &sqlx::Pool<sqlx::Postgres>, id:i32) -> Result<(), DbError> {
-        Ok(sqlx::query(include_str!("sql/delete.sql"))
-            .bind(id)
-            .execute(&pool)
-            .await?)
+        match sqlx::query_file!("sql/post/delete.sql", id)
+            .execute(pool)
+            .await {
+            Ok(_) => Ok(()),
+            Err(e) => Err(DbError::InternalError(e))
+        }
     }
     pub async fn delete(&self, pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), DbError> {
-        self.remove_by_id(self.id);
+        if self.id.is_none() {
+            return Err(DbError::InvalidData)
+        }
+        Self::remove_by_id(pool, self.id.unwrap()).await?;
+        Ok(())
     }
     pub async fn update(&self, pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), DbError> {
-        Ok(sqlx::query(include_str!("./sql/update.sql"))
+        if let Err(e) = sqlx::query(include_str!("../../../sql/post/update.sql"))
             .bind(self.id.clone().unwrap_or_default())
             .bind(self.title.clone().unwrap_or_default())
             .bind(self.content.clone().unwrap_or_default())
-            .execute(&pool)
-            .await?)
+            .execute(pool)
+            .await
+        {
+            return Err(DbError::InternalError(e));
+        }
+        Ok(())
     }
 }

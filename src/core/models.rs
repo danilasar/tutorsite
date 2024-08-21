@@ -1,8 +1,9 @@
 pub enum DbError {
     NotFound,
-    InvalidData
+    InvalidData,
+    InternalError(sqlx::Error)
 }
 
-trait GetAll {
+/*trait GetAll {
     async fn get_all() -> Result<Vec<Self>, DbError>;
-}
+}*/

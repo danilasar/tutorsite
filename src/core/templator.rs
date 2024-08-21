@@ -33,7 +33,7 @@ pub(crate) async fn wrap_page(service_data: &ServiceData<'_>,
         }
     };
 
-    let wrap = service_data.app_state.handlebars.render("wrap", &data).unwrap();
+    let wrap = service_data.context.handlebars.render("wrap", &data).unwrap();
 
     return wrap;
 }
