@@ -3,11 +3,12 @@
  валидировать данные, которые приносит питон, а далее -- сообщить об
  ошибке или передать их сервису.
  */
-mod posts;
+mod index;
+mod post;
+mod errors;
 
 use actix_web::web;
-use crate::handlers::posts::index::{page_index};
 
 pub fn setup(cfg: &mut web::ServiceConfig) {
-    cfg.service(page_index);
+    cfg.service(index::page_index);
 }

@@ -1,10 +1,10 @@
 use crate::core::models::DbError;
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug, Clone, sqlx::FromRow, serde::Serialize)]
 pub struct Post {
-    id: Option<i32>,
-    title: Option<String>,
-    content: Option<String>
+    pub id: Option<i32>,
+    pub title: Option<String>,
+    pub content: Option<String>
 }
 
 impl Post {

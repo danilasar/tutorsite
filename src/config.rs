@@ -11,11 +11,11 @@ pub struct Config {
 }
 
 fn default_port() -> u16 {
-    80
+    8080
 }
 
 fn default_potgres_url() -> String {
-    "postgres://postgres:postgres@db/kaluga".to_string()
+    "postgres://postgres:postgres@localhost/tutors".to_string()
 }
 
 fn default_host() -> String {

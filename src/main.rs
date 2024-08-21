@@ -1,7 +1,7 @@
 use std::env;
 use std::sync::Arc;
 use actix_web::{App, HttpServer};
-use actix_web::middleware::Logger;
+use actix_web::middleware::{Logger, NormalizePath};
 use actix_web::web::Data;
 use figment::Figment;
 use figment::providers::Env;
@@ -56,7 +56,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(ctx.clone()))
             .configure(handlers::setup)
+            .service(actix_files::Files::new("/static", "static").show_files_listing())
             .wrap(Logger::default())
+            .wrap(NormalizePath::trim())
     })
         .bind((config.host, config.port))
         .unwrap_or_else(|e| {

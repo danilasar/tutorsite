@@ -1,9 +1,9 @@
 use actix_session::{Session, SessionGetError};
 use serde_json::json;
 use crate::core::service_data::ServiceData;
-use crate::models::user::get_user_by_token;
+//use crate::models::user::get_user_by_token;
 
-pub(crate) async fn wrap_page(service_data: &ServiceData<'_>,
+pub(crate) async fn wrap_page(service_data: &ServiceData,
                               content: &str,
                               title: Option<&str>)
                               -> String
@@ -12,7 +12,7 @@ pub(crate) async fn wrap_page(service_data: &ServiceData<'_>,
         Some(T) => { T.to_str().unwrap_or("") },
         None => { "" }
     };
-    if(requested_with == "XMLHttpRequest") {
+    if requested_with == "XMLHttpRequest" {
         return content.to_string();
     }
 
@@ -24,16 +24,16 @@ pub(crate) async fn wrap_page(service_data: &ServiceData<'_>,
     let mut data = json!({ "content": content, "page": { "name": title.unwrap_or_default() } });
 
 
-    if let Ok(option) = service_data.session.get("token") {
+    /*if let Ok(option) = service_data.session.get("token") {
         let option : Option<String> = option;
         if let Some(token) = option {
             if let Ok(user) = get_user_by_token(&service_data.context.db, token.as_str()).await {
                 data["user"] = json!(user);
             }
         }
-    };
+    };*/
 
-    let wrap = service_data.context.handlebars.render("wrap", &data).unwrap();
+    let wrap = service_data.context.handlebars.render("layout", &data).unwrap();
 
     return wrap;
 }

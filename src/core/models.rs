@@ -1,3 +1,7 @@
+use derive_more::{Display, Error, From};
+
+#[derive(Debug, Display, Error, From)]
+//#[derive(Debug)]
 pub enum DbError {
     NotFound,
     InvalidData,

@@ -8,14 +8,14 @@ use crate::core::service_data::ServiceData;
 use crate::core::templator;
 
 #[get("/")]
-async fn page_index(req: HttpRequest, context: web::Data<Context<'_>>, session: Session) -> actix_web::Result<HttpResponse> {
-    let service_data = ServiceData::new(req, context, session).await?;
+async fn page_index(req: HttpRequest, context: web::Data<Context>, session: Session) -> actix_web::Result<HttpResponse> {
+    let service_data = ServiceData::new(req, context, session).await;
     let posts = crate::services::posts::get_posts(&service_data.context).await;
-    let about = context.handlebars
-        .render("index", &json!({ posts: posts }))
+    let about = service_data.context.handlebars
+        .render("index", &json!({ "posts": posts }))
         .unwrap_or_default();
 
-    let wrap = templator::wrap_page(&service_data, &*about, "О доме".into()).await;
+    let wrap = templator::wrap_page(&service_data, &*about, "Главная".into()).await;
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type(ContentType::plaintext())
         .body(wrap))
