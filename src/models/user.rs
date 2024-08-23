@@ -1,25 +1,12 @@
 use serde::{Deserialize, Serialize};
 use crate::core::models::DbError;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: Option<i32>,
     pub login: Option<String>,
     pub name: Option<String>,
     pub password_hash: Option<String>
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct UserRegisterForm {
-    pub login: String,
-    pub name: String,
-    pub password: String
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct UserLoginForm {
-    pub login: String,
-    pub password: String
 }
 
 impl User {

@@ -5,3 +5,4 @@
  к обработчику.
  */
 pub mod posts;
+pub(crate) mod users;

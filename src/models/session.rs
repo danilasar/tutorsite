@@ -35,10 +35,10 @@ impl Session {
     }
 
 
-    pub async fn generate_token(pool: &sqlx::Pool<sqlx::Postgres>,
-                                        mut user: User,
-                                        lifetime: Option<Duration>)
-                                        -> Result<Session, (DbError)>
+    pub async fn generate(pool: &sqlx::Pool<sqlx::Postgres>,
+                          mut user: User,
+                          lifetime: Option<Duration>)
+                          -> Result<Session, (DbError)>
     {
         if (user.id.is_none()) {
             if (user.login.is_none()) {

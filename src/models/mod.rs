@@ -4,4 +4,4 @@
 
 pub mod post;
 pub mod user;
-mod session;
+pub(crate) mod session;
