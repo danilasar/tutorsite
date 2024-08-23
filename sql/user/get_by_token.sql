@@ -7,4 +7,4 @@ LEFT JOIN
 ON
     sess.user_id = users.id
 WHERE
-    sess.user_id = users.id  AND sess."key" = $1;
+    sess.user_id = users.id  AND sess.token = $1;

@@ -55,10 +55,11 @@ impl Post {
         Ok(())
     }
     pub async fn update(&self, pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), DbError> {
-        if let Err(e) = sqlx::query(include_str!("../../../sql/post/update.sql"))
-            .bind(self.id.clone().unwrap_or_default())
-            .bind(self.title.clone().unwrap_or_default())
-            .bind(self.content.clone().unwrap_or_default())
+        if let Err(e) = sqlx::query_file!("sql/post/update.sql",
+            self.id.clone().unwrap_or_default(),
+            self.title.clone().unwrap_or_default(),
+            self.content.clone().unwrap_or_default()
+        )
             .execute(pool)
             .await
         {
