@@ -1,0 +1,8 @@
+{{#if authored}}[<a href="/posts/add/">Новый гайд</a>] [<a href="/posts/logout/">Выход</a>]{{/if}}
+<ol>
+{{#each posts}}
+    <li>
+        <a href="/posts/{{this.id}}">{{this.title}}</a>{{#if authored}} (<a href="/posts/edit/{{this.id}}" title="Редактировать">ред.</a>/<a href="/posts/edit/{{this.id}}" title="Удалить">уд.</a>){{/if}}
+    </li>
+{{/each}}
+</ol>

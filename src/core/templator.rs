@@ -21,7 +21,7 @@ pub(crate) async fn wrap_page(service_data: &ServiceData,
         .register_template_string("wrap", include_str!("../views/wrap.hbs"))
         .unwrap();*/
 
-    let mut data = json!({ "content": content, "page": { "name": title.unwrap_or_default() } });
+    let mut data = json!({ "page": { "name": title.unwrap_or_default(), "content": content } });
 
 
     /*if let Ok(option) = service_data.session.get("token") {

@@ -6,17 +6,27 @@ use serde_json::json;
 use crate::context::Context;
 use crate::core::service_data::ServiceData;
 use crate::core::templator;
+use crate::{models, services};
 
 #[get("/")]
 async fn page_index(req: HttpRequest, context: web::Data<Context>, session: Session) -> actix_web::Result<HttpResponse> {
     let service_data = ServiceData::new(req, context, session).await;
-    let posts = crate::services::posts::get_posts(&service_data.context).await;
+    /*models::user::User::add_user(&service_data.context.db, models::user::User {
+        id: None,
+        login: Option::from("логин".to_string()),
+        name: Option::from("имя".to_string()),
+        password_hash: Option::from(services::users::hash_password("пароль", "логин"))
+    }).await;*/
+    let posts = services::posts::get_posts_list(&service_data.context).await;
     let about = service_data.context.handlebars
-        .render("index", &json!({ "posts": posts }))
+        .render("index", &json!({
+            "posts": posts,
+            "authored": services::users::is_authored(&service_data).await
+        }))
         .unwrap_or_default();
 
     let wrap = templator::wrap_page(&service_data, &*about, "Главная".into()).await;
     Ok(HttpResponse::build(StatusCode::OK)
-        .content_type(ContentType::plaintext())
+        .content_type(ContentType::html())
         .body(wrap))
 }
