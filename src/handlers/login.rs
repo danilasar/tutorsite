@@ -45,7 +45,7 @@ async fn generate_login_page(service_data: &ServiceData,
         data["user"] = json!(user.unwrap());
     }
     let login = service_data.context.handlebars
-        .render("pages/login", &data)
+        .render("login", &data)
         .unwrap_or_default();
 
     let wrap = templator::wrap_page(&service_data, &login, "Вход".into()).await;

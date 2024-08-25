@@ -1,5 +1,5 @@
 use actix_session::Session;
-use actix_web::{get, http, HttpRequest, HttpResponse, web};
+use actix_web::{get, post, http, HttpRequest, HttpResponse, web};
 use actix_web::http::StatusCode;
 use http::header::ContentType;
 use serde_json::json;
@@ -27,6 +27,29 @@ async fn page_post(req: HttpRequest, context: web::Data<Context>, session: Sessi
 
     let wrap = templator::wrap_page(&service_data, &*about, Option::from(post.unwrap().title.unwrap_or_default().as_str())).await;
     Ok(HttpResponse::build(StatusCode::OK)
-        .content_type(ContentType::plaintext())
+        .content_type(ContentType::html())
         .body(wrap))
+}
+
+#[get("/post/add")]
+async fn page_add_post(req: HttpRequest, context: web::Data<Context>, session: Session) -> actix_web::Result<HttpResponse> {
+    let service_data = ServiceData::new(req, context, session).await;
+    if(!services::users::is_authored(&service_data).await) {
+        return utils::errors::page_403(&service_data).await;
+    }
+    let page = service_data.context.handlebars
+        .render("add_post", &json!({ }));
+    let wrap = templator::wrap_page(&service_data, &*page, "Новый гайд".as_str());
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type(ContentType::html())
+        .body(wrap))
+}
+
+#[post("/post/add")]
+async fn add_post(req: HttpRequest, context: web::Data<Context>, session: Session, params: web::Form<>) -> actix_web::Result<HttpResponse> {
+    let service_data = ServiceData::new(req, context, session).await;
+    if(!services::users::is_authored(&service_data).await) {
+        return utils::errors::page_403(&service_data).await;
+    }
+
 }
