@@ -1,4 +1,4 @@
 SELECT
-    id, title, content
+    id, title, description, content
 FROM
     posts

@@ -21,7 +21,7 @@ async fn page_index(req: HttpRequest, context: web::Data<Context>, session: Sess
     let about = service_data.context.handlebars
         .render("index", &json!({
             "posts": posts,
-            "authored": services::users::is_authored(&service_data).await
+            "authored": services::users::is_authored(&service_data).await,
         }))
         .unwrap_or_default();
 

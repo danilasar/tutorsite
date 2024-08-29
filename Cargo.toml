@@ -12,7 +12,7 @@ env_logger = "0.11.5"
 figment = { version = "0.10.19", features = ["env"] }
 handlebars = { version = "6.0.0", features = ["dir_source"] }
 log = "0.4.22"
-markdown = "0.3.0"
+markdown = "1.0.0-alpha.20"
 regex = "1.10.6"
 serde = { version = "1.0.206", features = ["derive"] }
 sqlx = { version = "0.8.0", features = ["postgres", "runtime-tokio", "chrono"] }

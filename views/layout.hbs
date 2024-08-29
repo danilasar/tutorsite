@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html lang="ru">
     <head>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-        <title>{{page.title}}</title>
+        <title>{{ page.name }} | Родители детям</title>
+
+        <link rel="stylesheet" href="/static/style.css" />
+        <link rel="stylesheet" href="/static/pages/error.css" />
+        <!--<link rel="stylesheet" href="/static/pages/guide.css" />
+        <link rel="stylesheet" href="/static/pages/index.css" />-->
+        <link rel="stylesheet" href="/static/pages/login.css" />
+        <link rel="stylesheet" href="/static/pages/new.css" />
+        <!-- Global styles -->
+        <!--<link rel="stylesheet" href="style.css" />-->
+        <!-- File styles -->
     </head>
     <body>
-        <header>
-            <h1><a href="/">Родители детям</a></h1>
-        </header>
         <main>
             {{{page.content}}}
         </main>
+{{#if authored}}<a href="/logout/">Выход</a>{{/if}}
+{{#if authored}}
+    <a href="/posts/add"><button class="admin">➕</button></a>
+
+        <script type="text/javascript">
+            if (true) {
+                // is admin?
+                document
+                        .querySelectorAll(".admin")
+                        .forEach((node) => node.classList.add("shown"));
+            }
+        </script>
+{{/if}}
     </body>
 </html>
