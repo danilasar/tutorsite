@@ -15,6 +15,16 @@
   margin: 0.5em 0;
 }
 
+#guide-area h1:not(:first-child),
+#guide-area h2:not(:first-child),
+#guide-area h3:not(:first-child),
+#guide-area h4:not(:first-child),
+#guide-area h5:not(:first-child),
+#guide-area h6:not(:first-child) {
+  margin: 1.5em 0 0.5em 0;
+}
+
+
 #guide-area h1 {
   font-size: 2em;
 }
@@ -56,6 +66,12 @@
   color: #75a8e3;
   text-decoration: underline solid transparent;
 }
+/*#guide-area a {
+  transition: 0.125s;
+  color: #0366d6;
+  text-decoration: none !important;
+}*/z
+
 
 #guide-area a:hover {
   text-decoration-color: currentColor;
@@ -106,9 +122,10 @@
 
 #guide-area table {
   border-collapse: collapse;
-  width: 100%;
-  margin: 20px 0;
+  width: auto;
+  margin: 1.5rem 0;
 }
+
 
 #guide-area th,
 #guide-area td {
