@@ -1,8 +1,24 @@
-{{#if authored}}[<a href="/posts/add/">Новый гайд</a>] [<a href="/posts/logout/">Выход</a>]{{/if}}
-<ol>
+<link rel="stylesheet" href="/static/pages/index.css" />
+<h1 class="index-header">Список основных гайдов для тебя!</h1>
+<div class="guide-card-wrapper">
 {{#each posts}}
-    <li>
-        <a href="/posts/{{this.id}}">{{this.title}}</a>{{#if authored}} (<a href="/posts/edit/{{this.id}}" title="Редактировать">ред.</a>/<a href="/posts/edit/{{this.id}}" title="Удалить">уд.</a>){{/if}}
-    </li>
+    <div class="guide-card glassmorph">
+        <h2 class="guide-title">{{this.title}}</h2>
+        <p class="guide-description">
+            {{this.description}}
+        </p>
+        <a href="/post/{{this.id}}">
+            <button>Читать</button>
+        </a>
+{{#if authored}}
+        <div class="admin">
+            <a href="/post/edit/{{this.id}}" title="Скачать"><button>👇</button></a>
+            <a href="/post/edit/{{this.id}}" title="Удалить"><button>🗑️</button></a>
+        </div>
+{{/if}}
+    </div>
 {{/each}}
-</ol>
+</div>
+
+
+{{#if authored}}<a href="/logout/">Выход</a>{{/if}}

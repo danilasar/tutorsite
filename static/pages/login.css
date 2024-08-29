@@ -1,0 +1,54 @@
+main {
+  max-width: min(90vw, 768px);
+  margin: auto;
+  height: 100dvh;
+  place-content: center;
+}
+
+.login-header {
+  text-align: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.login-form > .login-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.login-form > input[type="password"],
+.login-form > input[type="text"] {
+  transition: 0.25s;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-bottom: 2px solid #555;
+  font-size: x-large;
+  color: currentColor;
+  background-color: transparent;
+}
+
+.login-form > input[type="password"]:focus,
+.login-form > input[type="text"]:focus {
+  outline: none;
+  border-bottom-color: currentColor;
+}
+
+@media screen and (max-width: 768px) {
+  .login-header {
+    font-size: x-large;
+  }
+
+  .login-form > .login-controls {
+    flex-direction: column;
+  }
+}

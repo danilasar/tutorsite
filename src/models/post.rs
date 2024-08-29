@@ -4,6 +4,7 @@ use crate::core::models::DbError;
 pub struct Post {
     pub id: Option<i32>,
     pub title: Option<String>,
+    pub description: Option<String>,
     pub content: Option<String>
 }
 
@@ -28,6 +29,7 @@ impl Post {
             Post {
                 id: Option::from(p.id),
                 title: Option::from(p.title.clone()),
+                description: Option::from(p.description.clone()),
                 content: None
             }
         }).collect::<Vec<Post>>();
@@ -47,6 +49,7 @@ impl Post {
         let q = sqlx::query_file!(
                 "sql/post/create.sql",
                 self.title.clone().unwrap_or_default(),
+                self.description.clone().unwrap_or_default(),
                 self.content.clone().unwrap_or_default())
             .fetch_one(pool)
             .await;
@@ -75,6 +78,7 @@ impl Post {
         if let Err(e) = sqlx::query_file!("sql/post/update.sql",
             self.id.clone().unwrap_or_default(),
             self.title.clone().unwrap_or_default(),
+            self.description.clone().unwrap_or_default(),
             self.content.clone().unwrap_or_default()
         )
             .execute(pool)

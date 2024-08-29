@@ -1,8 +1,18 @@
-FROM rust:1.78.0
+FROM rust:1.78.0 as builder
 
-WORKDIR /usr/src/backend
-COPY . .
+WORKDIR /usr/src/app
 
-RUN cargo install --path .
+RUN rustup target add x86_64-unknown-linux-musl
 
-CMD ["backend"]
+COPY Cargo.toml Cargo.lock ./
+COPY src src
+COPY sql sql
+COPY views views 
+COPY static static
+RUN cargo build --target x86_64-unknown-linux-musl --release
+
+FROM scratch
+
+COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/tutors /usr/local/bin/tutors
+
+CMD ["tutors"]

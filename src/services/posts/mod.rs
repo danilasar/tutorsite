@@ -11,3 +11,7 @@ pub async fn get_post(context: &Context, id: i32) -> Option<Post> {
         Err(_) => None
     }
 }
+
+pub async fn add_post() {
+
+}
