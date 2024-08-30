@@ -5,7 +5,8 @@ pub struct Post {
     pub id: Option<i32>,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub content: Option<String>
+    pub content: Option<String>,
+    pub content_html: Option<String>
 }
 
 impl Post {
@@ -30,7 +31,8 @@ impl Post {
                 id: Option::from(p.id),
                 title: Option::from(p.title.clone()),
                 description: Option::from(p.description.clone()),
-                content: None
+                content: None,
+                content_html: None
             }
         }).collect::<Vec<Post>>();
 
@@ -50,7 +52,8 @@ impl Post {
                 "sql/post/create.sql",
                 self.title.clone().unwrap_or_default(),
                 self.description.clone().unwrap_or_default(),
-                self.content.clone().unwrap_or_default())
+                self.content.clone().unwrap_or_default(),
+                self.content_html.clone().unwrap_or_default())
             .fetch_one(pool)
             .await;
         if let Err(e) = q {
@@ -79,7 +82,8 @@ impl Post {
             self.id.clone().unwrap_or_default(),
             self.title.clone().unwrap_or_default(),
             self.description.clone().unwrap_or_default(),
-            self.content.clone().unwrap_or_default()
+            self.content.clone().unwrap_or_default(),
+            self.content_html.clone().unwrap_or_default()
         )
             .execute(pool)
             .await

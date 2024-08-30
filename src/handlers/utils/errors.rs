@@ -14,7 +14,7 @@ pub async fn page_500(service_data: &ServiceData) -> actix_web::Result<HttpRespo
 
     let wrap = templator::wrap_page(&service_data, &*page, "Я упал".into()).await;
     Ok(HttpResponse::build(StatusCode::NOT_FOUND)
-        .content_type(ContentType::plaintext())
+        .content_type(ContentType::html())
         .body(wrap))
 }
 
@@ -25,7 +25,7 @@ pub async fn page_404(service_data: &ServiceData) -> actix_web::Result<HttpRespo
 
     let wrap = templator::wrap_page(&service_data, &*page, "Страница не найдена".into()).await;
     Ok(HttpResponse::build(StatusCode::NOT_FOUND)
-        .content_type(ContentType::plaintext())
+        .content_type(ContentType::html())
         .body(wrap))
 }
 

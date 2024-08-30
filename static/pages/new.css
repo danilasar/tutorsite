@@ -1,7 +1,6 @@
 main {
   max-width: min(90vw, 768px);
   margin: auto;
-  height: 90dvh;
   place-content: center;
 }
 

@@ -19,13 +19,8 @@ async fn page_post(req: HttpRequest, context: web::Data<Context>, session: Sessi
     }
 
     let mut post = post.unwrap();
-    /*post.content = Option::from(post
-        .content
-        .unwrap_or_default()
-        .replace("\\", "\\\\")
-        .replace("`", "\\`")
-    );*/
-    let options = &markdown::Options::gfm();
+
+    /*let options = &markdown::Options::gfm();
 
     match markdown::to_html_with_options(post.content.unwrap_or_default().as_str(),
                                          &markdown::Options {
@@ -39,7 +34,7 @@ async fn page_post(req: HttpRequest, context: web::Data<Context>, session: Sessi
     ) {
         Ok(md) => post.content = Option::from(md),
         Err(e) => return utils::errors::page_500(&service_data).await
-    }
+    }*/
 
     let about = service_data.context.handlebars
         .render("post", &json!({
