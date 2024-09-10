@@ -22,7 +22,7 @@ async fn page_post(req: HttpRequest, context: web::Data<Context>, session: Sessi
 
     /*let options = &markdown::Options::gfm();
 
-    match markdown::to_html_with_options(post.content.unwrap_or_default().as_str(),
+    match markdown::to_html_with_options(post.content.clone().unwrap_or_default().as_str(),
                                          &markdown::Options {
                                              compile: markdown::CompileOptions {
                                                  allow_dangerous_html: true,
@@ -32,7 +32,7 @@ async fn page_post(req: HttpRequest, context: web::Data<Context>, session: Sessi
                                              ..markdown::Options::default()
                                          }
     ) {
-        Ok(md) => post.content = Option::from(md),
+        Ok(md) => post.content_html = Option::from(md),
         Err(e) => return utils::errors::page_500(&service_data).await
     }*/
 

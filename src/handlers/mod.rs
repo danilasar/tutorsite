@@ -8,6 +8,7 @@ mod post;
 mod errors;
 mod login;
 mod utils;
+mod update;
 
 use actix_session::Session;
 use actix_web::{get, HttpRequest, HttpResponse, web};
@@ -25,6 +26,7 @@ pub fn setup(cfg: &mut web::ServiceConfig) {
     cfg.service(login::get_login);
     cfg.service(login::post_login);
     cfg.service(login::get_logout);
+    cfg.service(update::update);
     cfg.default_service(
         web::route().to(page_404)
     );
