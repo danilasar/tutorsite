@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n    id, title, description, md_file\nFROM\n    posts",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "md_file",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "c45df7d61a02134de5fcc035e85512486af79deacb02ad9756a04164324608c7"
+}

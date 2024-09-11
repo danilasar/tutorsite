@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE\n    posts\nSET\n    title = $2, description = $3, md_file = $4\nWHERE\n    id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e964a1a06735f91a8d2b6b08e66cb5c69bd8bbd681a466ed02bcc21fec6eaceb"
+}

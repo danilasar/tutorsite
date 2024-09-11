@@ -1,6 +1,6 @@
 INSERT INTO
-    posts(title, description, content, content_html)
+    posts(title, description, md_file)
 VALUES
-    ($1, $2, $3, $4)
+    ($1, $2, $3)
 RETURNING
     id

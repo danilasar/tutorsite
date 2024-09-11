@@ -5,8 +5,7 @@ pub struct Post {
     pub id: Option<i32>,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub content: Option<String>,
-    pub content_html: Option<String>
+    pub md_file: Option<String>
 }
 
 impl Post {
@@ -31,8 +30,7 @@ impl Post {
                 id: Option::from(p.id),
                 title: Option::from(p.title.clone()),
                 description: Option::from(p.description.clone()),
-                content: None,
-                content_html: None
+                md_file: None
             }
         }).collect::<Vec<Post>>();
 
@@ -52,8 +50,7 @@ impl Post {
                 "sql/post/create.sql",
                 self.title.clone().unwrap_or_default(),
                 self.description.clone().unwrap_or_default(),
-                self.content.clone().unwrap_or_default(),
-                self.content_html.clone().unwrap_or_default())
+                self.md_file.clone().unwrap_or_default())
             .fetch_one(pool)
             .await;
         if let Err(e) = q {
@@ -70,6 +67,15 @@ impl Post {
             Err(e) => Err(DbError::InternalError(e))
         }
     }
+    pub async fn remove_by_filename(pool: &sqlx::Pool<sqlx::Postgres>, filename:&str) -> Result<(), DbError> {
+        match sqlx::query_file!("sql/post/delete_by_filename.sql", filename)
+            .execute(pool)
+            .await
+        {
+            Ok(_) => Ok(()),
+            Err(e) => Err(DbError::InternalError(e))
+        }
+    }
     pub async fn delete(&self, pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), DbError> {
         if self.id.is_none() {
             return Err(DbError::InvalidData)
@@ -82,13 +88,46 @@ impl Post {
             self.id.clone().unwrap_or_default(),
             self.title.clone().unwrap_or_default(),
             self.description.clone().unwrap_or_default(),
-            self.content.clone().unwrap_or_default(),
-            self.content_html.clone().unwrap_or_default()
+            self.md_file.clone().unwrap_or_default()
         )
             .execute(pool)
             .await
         {
             return Err(DbError::InternalError(e));
+        }
+        Ok(())
+    }
+
+    pub async fn update_filenames(pool: &sqlx::Pool<sqlx::Postgres>,
+                                 new_filename: &str,
+                                 old_filename: &str
+    ) -> Result<(), DbError>
+    {
+        if let Err(e) = sqlx::query_file!("sql/post/rename_md_file.sql",
+            old_filename,
+            new_filename
+        )
+            .execute(pool)
+            .await
+        {
+            return Err(DbError::InternalError(e))
+        }
+        Ok(())
+    }
+
+    pub async fn update_metadata_by_filename(&self,
+                                             pool: &sqlx::Pool<sqlx::Postgres>
+    ) -> Result<(), DbError>
+    {
+        if let Err(e) = sqlx::query_file!("sql/post/update_metadata_by_filename.sql",
+            self.md_file.clone().unwrap_or_default(),
+            self.title.clone().unwrap_or_default(),
+            self.description.clone().unwrap_or_default()
+        )
+            .execute(pool)
+            .await
+        {
+            return Err(DbError::InternalError(e))
         }
         Ok(())
     }

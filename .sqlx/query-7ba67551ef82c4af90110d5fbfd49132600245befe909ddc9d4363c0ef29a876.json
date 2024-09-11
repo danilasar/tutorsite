@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n    id, title, description\nFROM\n    posts",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7ba67551ef82c4af90110d5fbfd49132600245befe909ddc9d4363c0ef29a876"
+}

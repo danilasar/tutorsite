@@ -1,5 +1,5 @@
 SELECT
-    id, title, description, content, content_html
+    id, title, description, md_file
 FROM
     posts
 WHERE

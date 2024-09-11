@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO\n    public.sessions (token, user_id)\nVALUES\n    ($1, $2)\nRETURNING\n    expires;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "expires",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e5975e34216afc9ba12a82e4b91d31200219789c135c0c7d4fb811d31d03b751"
+}

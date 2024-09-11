@@ -9,7 +9,7 @@ pub(crate) async fn wrap_page(service_data: &ServiceData,
                               -> String
 {
     let requested_with = match service_data.req.headers().get("X-Requested-With") {
-        Some(T) => { T.to_str().unwrap_or("") },
+        Some(header_value) => { header_value.to_str().unwrap_or("") },
         None => { "" }
     };
     if requested_with == "XMLHttpRequest" {

@@ -1,7 +1,13 @@
+use std::io::{BufRead, Read};
 use std::ops::Deref;
+use std::path::{Path, PathBuf};
+use std::ptr::read;
 use git2::{FetchOptions, Oid, Repository};
+use log::error;
+use serde::de::Unexpected::Str;
 use crate::core::service_data::ServiceData;
 use crate::services::git::GitError::{*};
+use crate::models;
 
 #[derive(Debug)]
 pub enum GitError {
@@ -109,23 +115,166 @@ pub fn get_changed_files(repo: &Repository) -> Result<Vec<(git2::Delta, std::pat
     Ok(changed_files)
 }
 
-pub fn sync_posts(service_data: &ServiceData) -> Result<(), GitError> {
+fn get_filename(path_buf: &PathBuf) -> Result<&str, ()> {
+    match path_buf.file_name() {
+        Some(filename) => match filename.to_str() {
+            Some(filename) => Ok(filename),
+            None => Err(())
+        },
+        None => Err(())
+    }
+}
+
+fn get_path_to_html(path_buf: &PathBuf) -> PathBuf {
+    let mut html = path_buf.clone();
+    html.set_extension("md.html");
+    return html;
+}
+
+fn remove_html(path_buf: &PathBuf) {
+    let html = get_path_to_html(path_buf);
+    let _ = std::fs::remove_file(html);
+}
+
+fn remove_newline(s: &mut String) {
+    if s.ends_with('\n') {
+        s.pop();
+        if s.ends_with('\r') {
+            s.pop();
+        }
+    }
+}
+
+fn parse_post_markdown(path_buf: &PathBuf) -> Result<models::post::Post, ()> {
+    let mut post = models::post::Post {
+        id: None,
+        title: None,
+        description: None,
+        md_file: None
+    };
+    let file = match std::fs::File::open(path_buf) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Не могу открыть {:#?}: {:#?}", path_buf.file_name(), e);
+            return Err(())
+        }
+    };
+    let mut reader = std::io::BufReader::new(file);
+    let mut buf:String = String::new();
+    let _ = reader.read_line(&mut buf);
+    if(buf.trim() != "<!--") {
+        error!("В файле {:#?} не найден открывающий комментарий", path_buf.file_name());
+        return Err(())
+    }
+    buf.clear();
+    let _ = reader.read_line(&mut buf);
+    remove_newline(&mut buf);
+    post.title = Some(buf.clone());
+    buf.clear();
+    let _ = reader.read_line(&mut buf);
+    remove_newline(&mut buf);
+    post.description = Some(buf.clone());
+    buf.clear();
+    let _ = reader.read_line(&mut buf);
+    remove_newline(&mut buf);
+    if(buf.trim() != "-->") {
+        error!("В файле {:#?} не найден закрывающий комментарий", path_buf.file_name());
+        return Err(())
+    }
+    buf.clear();
+    post.md_file = Some(get_filename(path_buf).unwrap_or_default().to_string());
+    Ok(post)
+}
+
+fn compile_md(path_buf: &PathBuf) {
+    let mut file = match std::fs::File::open(path_buf) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Не могу открыть {:#?}: {:#?}", path_buf.file_name(), e);
+            return
+        }
+    };
+    let mut content_md = String::new();
+    if let Err(e) = file.read_to_string(&mut content_md) {
+        error!("Не могу прочесть {:#?}: {:#?}", path_buf.file_name(), e);
+        return
+    }
+
+    let options = &markdown::Options::gfm();
+
+    let content_html = match markdown::to_html_with_options(content_md.as_str(),
+                                             &markdown::Options {
+                                             compile: markdown::CompileOptions {
+                                                 allow_dangerous_html: true,
+                                                 allow_dangerous_protocol: true,
+                                                 ..markdown::CompileOptions::default()
+                                             },
+                                             ..markdown::Options::default()
+                                         }
+    ) {
+        Ok(html) => html,
+        Err(e) => {
+            error!("Не могу скомпилировать {:#?}: {:#?}", path_buf.file_name(), e);
+            return
+        }
+    };
+    if let Err(e) = std::fs::write(get_path_to_html(path_buf), content_html) {
+        error!("Не могу записать html-файл для {:#?}: {:#?}", path_buf.file_name(), e);
+        return
+    }
+}
+
+pub async fn sync_posts(service_data: &ServiceData) -> Result<(), GitError> {
     let repo_path = std::path::Path::new("static/repo").to_path_buf();
     let repo = load_repository(repo_path.as_path())?;
-    let changed_files = get_changed_files(&repo)?;
-    fast_forward(&repo)?;
+    fetch_updates(&repo)?; // git fetch origin
+    let changed_files = get_changed_files(&repo)?; // git diff master origin/master --name-only
+    fast_forward(&repo)?; // git pull origin master
     for changed_file in changed_files {
-        if(changed_file.0 == git2::Delta::Deleted) {
-            // удалить посты, аффилированные с changed_file.2 и сделать continue. также удалить html
-            continue;
-        } else if(changed_file.0 == git2::Delta::Renamed) {
-            // обновить путь к md-файлу changed_file.2 -> changed_file.1 и удалить старый html-файл
-        } else if(changed_file.0 == git2::Delta::Added) {
-            // создать пост
-        } else if(changed_file.0 == git2::Delta::Modified) {
-            // обновить в случае чего имя и описание поста
-        }
+        let new_filename = match get_filename(&changed_file.1) {
+            Ok(f) => f,
+            Err(_) => continue
+        };
+        let old_filename = match get_filename(&changed_file.2) {
+            Ok(f) => f,
+            Err(_) => continue
+        };
+        match changed_file.0 {
+            git2::Delta::Deleted => {
+                // удалить посты, аффилированные с changed_file.2 и сделать continue. также удалить html
+                let _ = models::post::Post::remove_by_filename(&service_data.context.db, old_filename).await;
+                remove_html(&changed_file.2);
+                continue;
+            },
+            git2::Delta::Renamed => {
+                // обновить путь к md-файлу changed_file.2 -> changed_file.1 и удалить старый html-файл
+                let _ = models::post::Post::update_filenames(&service_data.context.db,
+                                                             new_filename, old_filename).await;
+                remove_html(&changed_file.2);
+            },
+            git2::Delta::Added => {
+                // создать пост
+                let mut post = match parse_post_markdown(&changed_file.1) {
+                    Ok(post) => post,
+                    Err(_) => continue
+                };
+                if let Err(e) = post.create(&service_data.context.db).await {
+                    error!("Не могу создать пост {:#?}", post);
+                    continue
+                }
+            },
+            git2::Delta::Modified => {
+                // обновить в случае чего имя и описание поста
+                let mut post = match parse_post_markdown(&changed_file.1) {
+                    Ok(post) => post,
+                    Err(_) => continue
+                };
+                let _ = post.update_metadata_by_filename(&service_data.context.db).await;
+            },
+            _ => {}
+        };
         // скомпилировать md-файл
+        compile_md(&changed_file.1);
     }
 
     Ok(())

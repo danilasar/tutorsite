@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT\n    id, title, content\nFROM\n    posts\nWHERE\n    id = $1",
+  "query": "SELECT\n    id, login, name, password_hash\nFROM\n    public.users\nWHERE\n    id = $1;",
   "describe": {
     "columns": [
       {
@@ -10,13 +10,18 @@
       },
       {
         "ordinal": 1,
-        "name": "title",
+        "name": "login",
         "type_info": "Varchar"
       },
       {
         "ordinal": 2,
-        "name": "content",
-        "type_info": "Text"
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "password_hash",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -27,8 +32,9 @@
     "nullable": [
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "ab1a0fac85eb494964c6159966ff7076e99243b05bc5365816cbd2daaef6acaf"
+  "hash": "e2178673817cb10b47c4fee08e3ac8bc5b14d4ecf6da82b08a115a37d72af91b"
 }

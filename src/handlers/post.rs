@@ -1,3 +1,4 @@
+use std::io::Read;
 use actix_session::Session;
 use actix_web::{get, post, http, HttpRequest, HttpResponse, web};
 use actix_web::http::StatusCode;
@@ -36,9 +37,23 @@ async fn page_post(req: HttpRequest, context: web::Data<Context>, session: Sessi
         Err(e) => return utils::errors::page_500(&service_data).await
     }*/
 
+    let path_to_file = std::path::Path::new("static/repo/гайды").to_path_buf();
+    let path_to_file = path_to_file.join((post.md_file.unwrap_or_default() + ".html").as_str());
+    let mut file = match std::fs::File::open(path_to_file) {
+        Ok(f) => f,
+        Err(_) => return utils::errors::page_500(&service_data).await
+    };
+    let mut content = String::new();
+    let _ = file.read_to_string(&mut content);
+
     let about = service_data.context.handlebars
         .render("post", &json!({
-            "post": post.clone(),
+            "post": {
+                "id": post.id,
+                "title": post.title,
+                "description": post.description,
+                "content": content,
+            },
             "authored": services::users::is_authored(&service_data).await
         }))
         .unwrap_or_default();

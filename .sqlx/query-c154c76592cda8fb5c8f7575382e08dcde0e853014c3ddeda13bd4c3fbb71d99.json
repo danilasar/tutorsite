@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO\n    posts(title, content)\nVALUES\n    ($1, $2)\nRETURNING\n    id",
+  "query": "INSERT INTO\n    posts(title, description, md_file)\nVALUES\n    ($1, $2, $3)\nRETURNING\n    id",
   "describe": {
     "columns": [
       {
@@ -12,12 +12,13 @@
     "parameters": {
       "Left": [
         "Varchar",
-        "Text"
+        "Varchar",
+        "Varchar"
       ]
     },
     "nullable": [
       false
     ]
   },
-  "hash": "195b123805844f83fdc475425c8144fdd12e701b5b66901033f8ae20da8f6e41"
+  "hash": "c154c76592cda8fb5c8f7575382e08dcde0e853014c3ddeda13bd4c3fbb71d99"
 }

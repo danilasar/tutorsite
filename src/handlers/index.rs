@@ -6,7 +6,7 @@ use serde_json::json;
 use crate::context::Context;
 use crate::core::service_data::ServiceData;
 use crate::core::templator;
-use crate::{models, services};
+use crate::services;
 
 #[get("/")]
 async fn page_index(req: HttpRequest, context: web::Data<Context>, session: Session) -> actix_web::Result<HttpResponse> {

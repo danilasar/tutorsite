@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO\n    public.sessions (token, user_id, expires)\nVALUES\n    ($1, $2, $3);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int4",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9e1cf23f159ab716ba9f432fbbc693c19ed001f5ae34fc4a83a4d00c6ee867c7"
+}
