@@ -68,7 +68,6 @@ pub fn fetch_updates(repo : &Repository) -> Result<(), GitError> {
         )
     });
 
-    // Prepare fetch options.
     let mut fo = git2::FetchOptions::new();
     fo.remote_callbacks(callbacks);
 
@@ -89,7 +88,7 @@ pub fn get_changed_files(repo: &Repository) -> Result<Vec<(git2::Delta, std::pat
         Err(e) => return Err(OtherInternalError(e)),
     };
 
-    let mut changed_files : Vec<(git2::Delta, std::path::PathBuf, std::path::PathBuf)> = vec![]; // status, new, old
+    let mut changed_files : Vec<(git2::Delta, std::path::PathBuf, std::path::PathBuf)> = vec![];
 
     for delta in diff.deltas() {
         let repo_path = std::path::Path::new("static/repo").to_path_buf();
@@ -227,9 +226,9 @@ fn compile_md(path_buf: &PathBuf) {
 pub async fn sync_posts(service_data: &ServiceData) -> Result<(), GitError> {
     let repo_path = std::path::Path::new("static/repo").to_path_buf();
     let repo = load_repository(repo_path.as_path())?;
-    fetch_updates(&repo)?; // git fetch origin
-    let changed_files = get_changed_files(&repo)?; // git diff master origin/master --name-only
-    fast_forward(&repo)?; // git pull origin master
+    fetch_updates(&repo)?;
+    let changed_files = get_changed_files(&repo)?;
+    fast_forward(&repo)?;
     for changed_file in changed_files {
         let new_filename = match get_filename(&changed_file.1) {
             Ok(f) => f,
@@ -241,19 +240,16 @@ pub async fn sync_posts(service_data: &ServiceData) -> Result<(), GitError> {
         };
         match changed_file.0 {
             git2::Delta::Deleted => {
-                // удалить посты, аффилированные с changed_file.2 и сделать continue. также удалить html
                 let _ = models::post::Post::remove_by_filename(&service_data.context.db, old_filename).await;
                 remove_html(&changed_file.2);
                 continue;
             },
             git2::Delta::Renamed => {
-                // обновить путь к md-файлу changed_file.2 -> changed_file.1 и удалить старый html-файл
                 let _ = models::post::Post::update_filenames(&service_data.context.db,
                                                              new_filename, old_filename).await;
                 remove_html(&changed_file.2);
             },
             git2::Delta::Added => {
-                // создать пост
                 let mut post = match parse_post_markdown(&changed_file.1) {
                     Ok(post) => post,
                     Err(_) => continue
@@ -264,7 +260,6 @@ pub async fn sync_posts(service_data: &ServiceData) -> Result<(), GitError> {
                 }
             },
             git2::Delta::Modified => {
-                // обновить в случае чего имя и описание поста
                 let mut post = match parse_post_markdown(&changed_file.1) {
                     Ok(post) => post,
                     Err(_) => continue
@@ -273,7 +268,6 @@ pub async fn sync_posts(service_data: &ServiceData) -> Result<(), GitError> {
             },
             _ => {}
         };
-        // скомпилировать md-файл
         compile_md(&changed_file.1);
     }
 

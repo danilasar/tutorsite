@@ -17,6 +17,7 @@ async fn update(req: HttpRequest,
     if(!services::users::is_authored(&service_data).await) {
         return utils::errors::page_403(&service_data).await;
     }
+    log::info!("Запущено обновление данных");
     let _ = services::git::sync_posts(&service_data).await;
 
     Ok(HttpResponse::build(StatusCode::OK)
