@@ -18,7 +18,9 @@ async fn update(req: HttpRequest,
         return utils::errors::page_403(&service_data).await;
     }
     log::info!("Запущено обновление данных");
-    let _ = services::git::sync_posts(&service_data).await;
+    if let Err(e) = services::git::sync_posts(&service_data).await {
+        log::info!("{:#?}", e);
+    }
 
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type(ContentType::plaintext())
