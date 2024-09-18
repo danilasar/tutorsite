@@ -26,4 +26,23 @@ pub fn setup(cfg: &mut web::ServiceConfig) {
         web::route().to(page_404)
     );
 
+    let repo = std::fs::read_dir("static/repo").unwrap(); // это гг, если репы нет
+    for entry in repo {
+        if(entry.is_err()) {
+            continue;
+        }
+        let entry = entry.unwrap();
+        let is_dir = match entry.file_type() {
+            Ok(t) => t.is_dir(),
+            Err(_) => false
+        };
+        if(!is_dir) {
+            continue;
+        }
+        let fname = entry.file_name();
+        let mount_path = "/".to_string() + fname.to_str().unwrap_or_default();
+        let serve_from = "static/repo/".to_string() + fname.to_str().unwrap_or_default();
+        cfg.service(actix_files::Files::new(mount_path.as_str(), serve_from.as_str()).show_files_listing());
+    }
+
 }
