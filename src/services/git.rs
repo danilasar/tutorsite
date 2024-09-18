@@ -225,6 +225,7 @@ fn compile_md(path_buf: &PathBuf) {
 
 pub async fn sync_posts(service_data: &ServiceData) -> Result<(), GitError> {
     let repo_path = std::path::Path::new("static/repo").to_path_buf();
+    log::info!("{:#?}", repo_path);
     let repo = load_repository(repo_path.as_path())?;
     fetch_updates(&repo)?;
     let changed_files = get_changed_files(&repo)?;
