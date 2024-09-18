@@ -73,6 +73,7 @@ pub fn fetch_updates(repo : &Repository) -> Result<(), GitError> {
 
     match repo.find_remote("origin") {
         Ok(mut remote) => if let Err(e) = remote.fetch(&["master"], Some(&mut fo), None) {
+            log::info!("{:#?}", e);
             return Err(BranchNotFound("origin/master".to_string()))
         },
         Err(_) => return Err(RemoteNotFound("origin".to_string()))
