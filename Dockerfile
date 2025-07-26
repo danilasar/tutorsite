@@ -1,28 +1,26 @@
-FROM rust:1.78.0 as builder
-
-RUN apt-get update && apt-get install -y musl-tools pkg-config perl make && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+FROM rust:latest as builder
 
 WORKDIR /usr/src/app
-RUN rustup target add x86_64-unknown-linux-musl
-
-COPY Cargo.toml Cargo.lock ./
-COPY src src
-COPY sql sql
-COPY .sqlx .sqlx
-COPY views views 
-COPY static static
-
 ENV SQLX_OFFLINE=true
-RUN cargo build --target x86_64-unknown-linux-musl --release
+COPY Cargo.toml .
+COPY Cargo.lock .
+RUN mkdir src && echo "fn main() {}" > /usr/src/app/src/main.rs
+RUN apt-get update && apt-get install -y musl-tools pkg-config perl make && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN rustup target add x86_64-unknown-linux-musl
+RUN cargo build --target x86_64-unknown-linux-musl --release --locked
 
-FROM scratch
+COPY . .
+RUN ls /usr/src/app
+RUN cargo build --target x86_64-unknown-linux-musl --release --locked && sleep 600
 
-WORKDIR /app 
-
-COPY --from=builder usr/src/app/target/x86_64-unknown-linux-musl/release/tutors /app/tutors
+FROM alpine
+WORKDIR /app
+COPY --from=builder /usr/src/app/target/release/tutors /app/tutors
 COPY --from=builder /usr/src/app/sql /app/sql
-COPY static /app/static 
+COPY static /app/static
 COPY views /app/views
-CMD ["/app/tutors"]
 
+RUN ls /app
+
+CMD ["/app/tutors"]

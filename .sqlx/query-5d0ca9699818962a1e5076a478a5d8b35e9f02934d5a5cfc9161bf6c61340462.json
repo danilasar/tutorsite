@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM\n    public.posts\nWHERE\n    md_file = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5d0ca9699818962a1e5076a478a5d8b35e9f02934d5a5cfc9161bf6c61340462"
+}
