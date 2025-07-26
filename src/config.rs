@@ -15,10 +15,9 @@ fn default_port() -> u16 {
 }
 
 fn default_potgres_url() -> String {
-    "postgres://postgres:postgres@localhost/tutors".to_string()
+    "postgres://postgres:postgres@db/tutors".to_string()
 }
 
 fn default_host() -> String {
-    "127.0.0.1".to_string()
+    "0.0.0.0".to_string()
 }
-
