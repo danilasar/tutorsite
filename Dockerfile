@@ -12,11 +12,13 @@ RUN cargo build --target x86_64-unknown-linux-musl --release --locked
 
 COPY . .
 RUN ls /usr/src/app
-RUN cargo build --target x86_64-unknown-linux-musl --release --locked && sleep 600
+# RUN sh build.sh
+RUN touch src/main.rs
+RUN cargo build --target x86_64-unknown-linux-musl --release --locked 
 
 FROM alpine
 WORKDIR /app
-COPY --from=builder /usr/src/app/target/release/tutors /app/tutors
+COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/tutors /app/tutors
 COPY --from=builder /usr/src/app/sql /app/sql
 COPY static /app/static
 COPY views /app/views
