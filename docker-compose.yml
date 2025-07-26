@@ -1,27 +1,32 @@
-version: "3.9"
-
 services:
   db:
-    image: postgres:16.2
+    image: postgres:17.5
     restart: always
-#    user: postgres
     environment:
-     - POSTGRES_USER=postgres
-     - POSTGRES_PASSWORD=postgres
-     - POSTGRES_DB=kaluga
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=tutors
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     ports:
-     - "5432:5432"
+      - "5432:5432"
     volumes:
-     - pgdata:/var/lib/postgresql/data
-     - ./database:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
 
   website:
     build: ./
     restart: always
-    ports:
-      - "8080:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/tutors
     volumes:
       - ./public:/public
 
