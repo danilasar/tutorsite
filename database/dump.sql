@@ -16,20 +16,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE ONLY public.sessions DROP CONSTRAINT session_users_id_fk;
-DROP INDEX public.users_login_uindex;
-DROP INDEX public.posts_title_index;
-DROP INDEX public.posts_md_file_index;
-ALTER TABLE ONLY public.users DROP CONSTRAINT users_pk;
-ALTER TABLE ONLY public.sessions DROP CONSTRAINT session_pk;
-ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_pk;
-ALTER TABLE public.users ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.posts ALTER COLUMN id DROP DEFAULT;
-DROP SEQUENCE public.users_id_seq;
-DROP TABLE public.users;
-DROP TABLE public.sessions;
-DROP SEQUENCE public.posts_id_seq;
-DROP TABLE public.posts;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -138,6 +124,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 COPY public.users (id, login, name, password_hash) FROM stdin;
 1	danilasar	Даня	bbc9c27f06c5275429f523e1a3955b9e33f1a90d88c19ef260da9e500494d6cf1f591d05afaedd64778329c63b023b12e5706e84de4972cfa82fbbc3fa66761d
+2	gohy	    Иван	a19502627632c6688cb1a3fa13eadeaf27abd6ae078554161afc238e214a4de72a48ce92b9276ad7c4d274677aed5b9a70b10348da686a1ab577dad9e8b820a2
 \.
 
 
@@ -211,4 +198,3 @@ ALTER TABLE ONLY public.sessions
 --
 -- PostgreSQL database dump complete
 --
-
